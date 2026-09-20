@@ -1,29 +1,50 @@
+import sqlite3
 import os
-import requests
 
-class PDFDownloader:
-    @staticmethod
-    def download_pdf(url, save_dir="downloads"):
-        """从指定 URL 下载 PDF 文件到本地目录"""
-        try:
-            if not os.path.exists(save_dir):
-                os.makedirs(save_dir)
-            
-            response = requests.get(url, stream=True, timeout=30)
-            response.raise_for_status()
-            
-            # 从 URL 提取文件名，若无法识别则使用默认名称
-            file_name = url.split("/")[-1].split("?")[0]
-            if not file_name or not file_name.endswith(".pdf"):
-                file_name = "downloaded_document.pdf"
-            
-            file_path = os.path.join(save_dir, file_name)
-            
-            with open(file_path, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-                        
-            return True, file_path, "下载成功"
-        except Exception as e:
-            return False, "", f"下载失败: {str(e)}"
+class DatabaseManager:
+    def __init__(self, db_path="pdf_records.db"):
+        self.db_path = db_path
+        self.init_db()
+
+    def get_connection(self):
+        """获取本地 SQLite 数据库连接"""
+        return sqlite3.connect(self.db_path)
+
+    def init_db(self):
+        """初始化 SQLite 数据库及存储表结构"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS records (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                file_name TEXT NOT NULL,
+                file_path TEXT NOT NULL,
+                raw_text TEXT,
+                structured_data TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+        conn.close()
+
+    def insert_record(self, file_name, file_path, raw_text, structured_data):
+        """插入解析与清洗后的文档记录"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO records (file_name, file_path, raw_text, structured_data)
+            VALUES (?, ?, ?, ?)
+        ''', (file_name, file_path, raw_text, structured_data))
+        conn.commit()
+        record_id = cursor.lastrowid
+        conn.close()
+        return record_id
+
+    def fetch_all_records(self):
+        """查询所有已处理的记录概要"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, file_name, file_path, created_at FROM records ORDER BY created_at DESC')
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
