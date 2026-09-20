@@ -7,7 +7,7 @@ class DatabaseManager:
         self.init_db()
 
     def get_connection(self):
-        """获取数据库连接"""
+        """获取本地 SQLite 数据库连接"""
         return sqlite3.connect(self.db_path)
 
     def init_db(self):
