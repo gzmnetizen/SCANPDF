@@ -1,10 +1,10 @@
 import sys
 import os
-from PyQt6.QtWidgets import (
+from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QTextEdit, QLineEdit, QLabel, QFileDialog, QTabWidget, QMessageBox
 )
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal
 
 # 导入各个功能模块
 from downloader import PDFDownloader
@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
         api_layout = QHBoxLayout()
         self.api_label = QLabel("Gemini API Key (可选):")
         self.api_input = QLineEdit()
-        self.api_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.api_input.setEchoMode(QLineEdit.Password)
         self.api_input.setPlaceholderText("留空则使用本地默认模式或环境变量")
         api_layout.addWidget(self.api_label)
         api_layout.addWidget(self.api_input)
@@ -182,4 +182,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
