@@ -1,0 +1,6 @@
+PyQt6>=6.4.0
+PyMuPDF>=1.22.0
+requests>=2.28.0
+paddleocr>=2.6.0
+paddlepaddle>=2.4.0
+pyinstaller>=5.0
