@@ -3,8 +3,9 @@ from paddleocr import PaddleOCR
 
 class OCRProcessor:
     def __init__(self):
-        """初始化 PaddleOCR 实例（支持中英文识别与方向分类）"""
+        """初始化 PaddleOCR 实例（支持中英文识别与方向分类，适配 Windows 7 本地离线环境）"""
         try:
+            # 离线运行环境通常会自动加载用户目录下缓存的模型权重文件
             self.ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
             self.initialized = True
         except Exception as e:
